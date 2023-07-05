@@ -2,17 +2,18 @@ package template
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
 	"time"
 
+	"github.com/civilware/Gnomon/structures"
 	dreams "github.com/dReam-dApps/dReams"
 	"github.com/dReam-dApps/dReams/bundle"
 	"github.com/dReam-dApps/dReams/menu"
 	"github.com/dReam-dApps/dReams/rpc"
+	"github.com/sirupsen/logrus"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -22,11 +23,16 @@ import (
 
 // // dReams Template dApp
 
+var logger = structures.Logger.WithFields(logrus.Fields{})
+
 // Run Template as a single dApp, this func is used in cmd/main.go
 func StartApp() {
 	// Set max cpu
 	n := runtime.NumCPU()
 	runtime.GOMAXPROCS(n)
+
+	// Initialize logger to Stdout
+	menu.InitLogrusLog(runtime.GOOS == "windows")
 
 	// Read dReams config file
 	config := menu.ReadDreamsConfig(app_name)
@@ -49,16 +55,20 @@ func StartApp() {
 	// Set what we'd like to happen on close.
 	// Here we are saving dReams config file with Skin,
 	// closing Gnomon, our main process and then Fyne window
-	w.SetCloseIntercept(func() {
+	closeFunc := func() {
 		menu.WriteDreamsConfig(
 			dreams.DreamSave{
 				Skin:   bundle.AppColor,
 				Daemon: []string{rpc.Daemon.Rpc},
+				DBtype: menu.Gnomes.DBType,
 			})
 		menu.Gnomes.Stop(app_name)
 		quit <- struct{}{}
 		w.Close()
-	})
+	}
+
+	// Assign closeFunc to window close
+	w.SetCloseIntercept(closeFunc)
 
 	// This channel will receive CTRL+C signal to close app
 	// and do the same as the above SetCloseIntercept()
@@ -67,14 +77,7 @@ func StartApp() {
 	go func() {
 		<-c
 		fmt.Println()
-		menu.WriteDreamsConfig(
-			dreams.DreamSave{
-				Skin:   bundle.AppColor,
-				Daemon: []string{rpc.Daemon.Rpc},
-			})
-		menu.Gnomes.Stop(app_name)
-		quit <- struct{}{}
-		w.Close()
+		closeFunc()
 	}()
 
 	// Initialize Gnomon fast sync to true so we can quickly create a DB to use
@@ -93,7 +96,7 @@ func StartApp() {
 	// additions may be needed to this process to meet to your requirements
 	go func() {
 		// Print out some info about our Template
-		log.Printf("[%s] %s %s %s\n", app_name, rpc.DREAMSv, runtime.GOOS, runtime.GOARCH)
+		logger.Printf("[%s] %s %s %s\n", app_name, rpc.DREAMSv, runtime.GOOS, runtime.GOARCH)
 
 		// Delay the routine to give time for app to start
 		time.Sleep(6 * time.Second)
@@ -131,7 +134,12 @@ func StartApp() {
 					// If Gnomon is running we can start to do some checks
 					if menu.Gnomes.IsRunning() {
 						// This will populate the Gnomes.SCID count var
-						menu.Gnomes.IndexContains()
+						contracts := menu.Gnomes.IndexContains()
+
+						// Refresh Gnomon and daemon height displays
+						gnomonLabel.SetText(fmt.Sprintf("Gnomon Height: %d", menu.Gnomes.Indexer.LastIndexedHeight))
+						indexLabel.SetText(fmt.Sprintf("Indexed SCIDs: %d", len(contracts)))
+						daemonLabel.SetText(fmt.Sprintf("Daemon Height: %d", menu.Gnomes.Indexer.ChainHeight))
 
 						// This will set the Gnomes.Check value to
 						// true once 100 or more contracts have been indexed
@@ -156,13 +164,13 @@ func StartApp() {
 				// Here we can use our offset to call a function once every 30 seconds
 				offset++
 				if offset%10 == 0 {
-					log.Println("[Template] Offset called here")
+					logger.Println("[Template] Offset called here")
 					offset = 0
 				}
 
 				// Exit Templates main process
 			case <-quit:
-				log.Println("[Template] Closing...")
+				logger.Println("[Template] Closing...")
 
 				// Stop Gnomon indicator if it exists
 				if menu.Gnomes.Icon_ind != nil {
@@ -184,7 +192,7 @@ func StartApp() {
 	// our window to run for a moment before placing layout
 	go func() {
 		time.Sleep(450 * time.Millisecond)
-		w.SetContent(container.NewMax(d.Background, LayoutAllItems(false, d)))
+		w.SetContent(container.NewMax(d.Background, LayoutAllItems(false, &d)))
 	}()
 
 	// Start Template dApp
@@ -192,5 +200,5 @@ func StartApp() {
 
 	// We can use this channel for ensuring any closures after main window has closed.
 	<-done
-	log.Printf("[%s] Closed\n", app_name)
+	logger.Printf("[%s] Closed\n", app_name)
 }

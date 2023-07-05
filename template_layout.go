@@ -2,7 +2,6 @@ package template
 
 import (
 	"image/color"
-	"log"
 
 	dreams "github.com/dReam-dApps/dReams"
 	"github.com/dReam-dApps/dReams/bundle"
@@ -27,21 +26,17 @@ import (
 
 // // Simple LayoutAllItems() example for package dApps
 
+// Global display labels
+var gnomonLabel = widget.NewLabel("Gnomon Height:")
+var daemonLabel = widget.NewLabel("Daemon Height:")
+var indexLabel = widget.NewLabel("Indexed SCIDs:")
+
 // Entire Template dApp layout is in this func, returned as fyne.CanvasObject
 // it can be handled differently depending on if it is imported or not,
 // 'd' is the dReams app object which Templates routines will get signals and checks from
-func LayoutAllItems(imported bool, d dreams.DreamsObject) (max fyne.CanvasObject) {
-	// A couple widgets to get started
-	label := container.NewCenter(widget.NewLabel("This is a label"))
-
-	// Text entry
-	entry := widget.NewEntry()
-	entry.SetPlaceHolder("Text Entry:")
-
-	// Button that will print out the current text of entry when pressed
-	button := widget.NewButton("Button", func() {
-		log.Printf("[Template] Text entry contains {%s}\n", entry.Text)
-	})
+func LayoutAllItems(imported bool, d *dreams.DreamsObject) (max fyne.CanvasObject) {
+	// Place the global labels into containers
+	label := container.NewCenter(container.NewHBox(gnomonLabel, indexLabel, daemonLabel))
 
 	// Radio widget that will change Templates skin and connect_box Balance label color
 	radio := widget.NewRadioGroup([]string{"Dark", "Light"}, func(s string) {
@@ -50,12 +45,10 @@ func LayoutAllItems(imported bool, d dreams.DreamsObject) (max fyne.CanvasObject
 			// We can tie into the current AppColor of dReams with bundle.AppColor
 			// when Templates closes it wil save the AppColor
 			bundle.AppColor = color.Black
-
 		case "Light":
 			bundle.AppColor = color.White
 		default:
 
-			return
 		}
 
 		// bundle.DeroTheme() has a light and dark theme
@@ -65,16 +58,17 @@ func LayoutAllItems(imported bool, d dreams.DreamsObject) (max fyne.CanvasObject
 		connect_box.Balance.Color = bundle.TextColor
 		connect_box.Balance.Refresh()
 	})
+	radio.Horizontal = true
 
 	// A container for our widgets
-	tab1_cont := container.NewBorder(label, button, nil, nil, entry)
+	tab1_cont := container.NewBorder(label, container.NewCenter(radio), nil, nil)
 
 	// Another container for widgets on a different tab
-	tab2_cont := container.NewMax(container.NewCenter(radio))
+	tab2_cont := container.NewMax(container.NewMax())
 
 	// These are the tabs we want in our Template
-	// First tab is some widgets with a dynamic alpha layer behind it
-	// Second is the radio widget to change Template skin
+	// First tab is labels and radio widget with a dynamic alpha layer behind it
+	// Second is a empty tab
 	// Third is a UI log which can be used to record session TXs and info
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Tab1", container.NewMax(bundle.NewAlpha120(), tab1_cont)),
@@ -85,11 +79,9 @@ func LayoutAllItems(imported bool, d dreams.DreamsObject) (max fyne.CanvasObject
 	tabs.OnSelected = func(ti *container.TabItem) {
 		switch ti.Text {
 		case "Tab1":
-			log.Println("[Template] Tab1 Selected")
+			logger.Println("[Template] Tab1 Selected")
 		case "Tab2":
-			log.Println("[Template] Tab2 Selected")
-		case "Log":
-			log.Println("[Template] Log Selected")
+			logger.Println("[Template] Tab2 Selected")
 		default:
 
 		}
@@ -115,11 +107,11 @@ func LayoutAllItems(imported bool, d dreams.DreamsObject) (max fyne.CanvasObject
 
 // This is a construction of dwidget.DeroRpcEntries which is used to
 // run Template independently, connect_box has been declared globally
-// to the package for easy of use. It will connect to Dero wallet and
+// to the package for ease of use. It will connect to Dero wallet and
 // daemon RPC, and start Gnomon if connected, indexing all SCIDS
 func connectBox() *fyne.Container {
 	// Initialize connect_box on trailing edge to fit our tabs in LayoutAllItems()
-	connect_box = dwidget.HorizontalEntries(app_name, 1)
+	connect_box = dwidget.NewHorizontalEntries(app_name, 1)
 
 	// Set what we'd like to occur when button is pressed
 	connect_box.Button.OnTapped = func() {
@@ -131,7 +123,7 @@ func connectBox() *fyne.Container {
 
 		// Here we are starting Gnomon without a search filter to index all SCIDs
 		if rpc.Daemon.IsConnected() && !menu.Gnomes.IsInitialized() && !menu.Gnomes.Start {
-			go menu.StartGnomon(app_name, "boltdb", []string{}, 0, 0, nil)
+			go menu.StartGnomon(app_name, menu.Gnomes.DBType, []string{}, 0, 0, nil)
 		}
 	}
 

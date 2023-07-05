@@ -1,7 +1,6 @@
 package template
 
 import (
-	"log"
 	"time"
 
 	dreams "github.com/dReam-dApps/dReams"
@@ -23,7 +22,7 @@ var template_synced bool
 // We can use this func for any initialization required by Template
 func initValues() {
 	template_synced = false
-	log.Panicln("Template Initialized")
+	logger.Println("Template Initialized")
 }
 
 // // Process loop examples for packages
@@ -32,7 +31,7 @@ func initValues() {
 // fetch() example we will add more functionality to the process
 
 // fetch1() is a basic main process routine for Template dApp
-func fetch1(d dreams.DreamsObject) {
+func fetch1(d *dreams.DreamsObject) {
 	// Set any initialization values here
 	initValues()
 
@@ -63,7 +62,7 @@ func fetch1(d dreams.DreamsObject) {
 
 		case <-d.CloseDapp():
 			// This is the close signal from dReams, do any required close funcs here and return
-			log.Println("[Template] Done")
+			logger.Println("[Template] Done")
 			return
 		}
 	}
@@ -72,7 +71,7 @@ func fetch1(d dreams.DreamsObject) {
 // Building off fetch1(), in this function three additions
 // have been made, we preform a initial Gnomon scan, check if
 // dReams is viewing Template and send a notification to dReams
-func fetch2(d dreams.DreamsObject) {
+func fetch2(d *dreams.DreamsObject) {
 	initValues()
 	time.Sleep(3 * time.Second)
 	for {
@@ -89,9 +88,9 @@ func fetch2(d dreams.DreamsObject) {
 
 			// Template will control template_synced, we do not want
 			// to preform this scan while dReams is configuring
-			if !template_synced && menu.GnomonScan(d.Configure) {
+			if !template_synced && menu.GnomonScan(d.IsConfiguring()) {
 				// Preform required funcs and set local synced var to true
-				log.Println("[Template] Syncing")
+				logger.Println("[Template] Syncing")
 
 				//  someGnomonFuncs()
 
@@ -101,7 +100,7 @@ func fetch2(d dreams.DreamsObject) {
 			// Here we will see if dReams is currently viewing
 			// the Template tab and can process as we need accordingly
 			if d.OnTab(app_name) {
-				log.Println("[Template] dReams is looking at Template")
+				logger.Println("[Template] dReams is looking at Template")
 			}
 
 			// someFuncs()
@@ -110,7 +109,7 @@ func fetch2(d dreams.DreamsObject) {
 		case <-d.CloseDapp():
 			// Here we will send a notification that dReams will display
 			d.Notification("From Template", "Hello dReams")
-			log.Println("[Template] Done")
+			logger.Println("[Template] Done")
 			return
 		}
 	}
@@ -140,8 +139,8 @@ func DreamsMenuIntro() (entries map[string][]string) {
 }
 
 // Function for when Template tab is selected in dReams
-func OnTabSelected(d dreams.DreamsObject) {
-	log.Println("[Template] OnTabSelected()")
+func OnTabSelected(d *dreams.DreamsObject) {
+	logger.Println("[Template] OnTabSelected()")
 }
 
 // Function for when Template tab is first connected
