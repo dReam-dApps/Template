@@ -1,6 +1,6 @@
 package main
 
-import template "github.com/dReam-dApps/Template"
+import "github.com/dReam-dApps/Template/template"
 
 func main() {
 	template.StartApp()

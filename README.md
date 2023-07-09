@@ -10,11 +10,11 @@ The repo is structured in a way so you can build isolated dApps, as well as ones
 ### Files
 Suggested order of viewing this repo:
 
-1. `template_layout.go` 
+1. `template/template_layout.go` 
     - Demonstrates the concept of creating a LayoutAllItems() to create importable dApps. Visit Fyne's [developer guides](https://developer.fyne.io/) for docs on building Fyne layouts.
-2. `template.go` 
+2. `template/template.go` 
     - Demonstrates tying a dApps process loop into the main dReams process if imported, and has various function examples.
-3. `start.go` 
+3. `template/start.go` 
      - Contains the StartApp() used to run Template as a stand alone application.
 
 ### Usage 
@@ -26,9 +26,8 @@ Suggested order of viewing this repo:
 https://github.com/dReam-dApps/Template.git
 cd Template
 ```
-- Make changes and run with:
+- Make changes to files inside of `Template/template` package directory and run with:
 ```
-cd cmd
 go run .
 ```
 - Change directory and package name(s) and import paths accordingly for your import
