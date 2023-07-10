@@ -5,7 +5,7 @@ go 1.20
 require (
 	fyne.io/fyne/v2 v2.3.1
 	github.com/civilware/Gnomon v0.0.0-20230703232528-e21fea150fdf
-	github.com/dReam-dApps/dReams v0.10.0
+	github.com/dReam-dApps/dReams v0.10.1-0.20230710164208-730f5f221a71
 	github.com/sirupsen/logrus v1.9.3
 )
 

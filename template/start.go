@@ -57,7 +57,7 @@ func StartApp() {
 	// closing Gnomon, our main process and then Fyne window
 	closeFunc := func() {
 		menu.WriteDreamsConfig(
-			dreams.DreamSave{
+			dreams.SaveData{
 				Skin:   bundle.AppColor,
 				Daemon: []string{rpc.Daemon.Rpc},
 				DBtype: menu.Gnomes.DBType,
@@ -83,11 +83,11 @@ func StartApp() {
 	// Initialize Gnomon fast sync to true so we can quickly create a DB to use
 	menu.Gnomes.Fast = true
 
-	// Here we make a dreams.DreamsObject for our Template,
+	// Here we make a dreams.AppObject for our Template,
 	// initializing Background that is a max container with a canvas.Image
 	// and Window as our Fyne window 'w'
 	dreams.Theme.Img = *canvas.NewImageFromResource(nil)
-	d := dreams.DreamsObject{
+	d := dreams.AppObject{
 		Window:     w,
 		Background: container.NewMax(&dreams.Theme.Img),
 	}

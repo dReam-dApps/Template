@@ -20,7 +20,7 @@ import (
 // Fyne max container and starts any required routines. Using this
 // Template package you can create local dApps that will run independently
 // while also being able to be imported for use in other Go/Fyne applications.
-// dReams has structs like dream.DreamsItems that can help in organizing content
+// dReams has structs like dream.ContainerStack that can help in organizing content
 // although you are free to set your layout up in any manner you please
 // see developer.fyne.io for more info on Fyne layouts
 
@@ -34,7 +34,7 @@ var indexLabel = widget.NewLabel("Indexed SCIDs:")
 // Entire Template dApp layout is in this func, returned as fyne.CanvasObject
 // it can be handled differently depending on if it is imported or not,
 // 'd' is the dReams app object which Templates routines will get signals and checks from
-func LayoutAllItems(imported bool, d *dreams.DreamsObject) (max fyne.CanvasObject) {
+func LayoutAllItems(imported bool, d *dreams.AppObject) (max fyne.CanvasObject) {
 	// Place the global labels into containers
 	label := container.NewCenter(container.NewHBox(gnomonLabel, indexLabel, daemonLabel))
 
@@ -64,7 +64,7 @@ func LayoutAllItems(imported bool, d *dreams.DreamsObject) (max fyne.CanvasObjec
 	tab1_cont := container.NewBorder(label, container.NewCenter(radio), nil, nil)
 
 	// Another container for widgets on a different tab
-	tab2_cont := container.NewMax(container.NewMax())
+	tab2_cont := container.NewCenter(widget.NewButton("Import", func() { go importPackage() }))
 
 	// These are the tabs we want in our Template
 	// First tab is labels and radio widget with a dynamic alpha layer behind it

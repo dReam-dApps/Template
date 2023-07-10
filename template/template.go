@@ -31,7 +31,7 @@ func initValues() {
 // fetch() example we will add more functionality to the process
 
 // fetch1() is a basic main process routine for Template dApp
-func fetch1(d *dreams.DreamsObject) {
+func fetch1(d *dreams.AppObject) {
 	// Set any initialization values here
 	initValues()
 
@@ -71,7 +71,7 @@ func fetch1(d *dreams.DreamsObject) {
 // Building off fetch1(), in this function three additions
 // have been made, we preform a initial Gnomon scan, check if
 // dReams is viewing Template and send a notification to dReams
-func fetch2(d *dreams.DreamsObject) {
+func fetch2(d *dreams.AppObject) {
 	initValues()
 	time.Sleep(3 * time.Second)
 	for {
@@ -139,7 +139,7 @@ func DreamsMenuIntro() (entries map[string][]string) {
 }
 
 // Function for when Template tab is selected in dReams
-func OnTabSelected(d *dreams.DreamsObject) {
+func OnTabSelected(d *dreams.AppObject) {
 	logger.Println("[Template] OnTabSelected()")
 }
 
