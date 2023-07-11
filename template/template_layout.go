@@ -39,7 +39,14 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) (max fyne.CanvasObject) 
 	label := container.NewCenter(container.NewHBox(gnomonLabel, indexLabel, daemonLabel))
 
 	// Radio widget that will change Templates skin and connect_box Balance label color
-	radio := widget.NewRadioGroup([]string{"Dark", "Light"}, func(s string) {
+	radio := widget.NewRadioGroup([]string{"Dark", "Light"}, nil)
+	if bundle.AppColor == color.White {
+		radio.SetSelected("Light")
+	} else {
+		radio.SetSelected("Dark")
+	}
+	radio.Horizontal = true
+	radio.OnChanged = func(s string) {
 		switch s {
 		case "Dark":
 			// We can tie into the current AppColor of dReams with bundle.AppColor
@@ -51,20 +58,25 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) (max fyne.CanvasObject) 
 
 		}
 
-		// bundle.DeroTheme() has a light and dark theme
-		fyne.CurrentApp().Settings().SetTheme(bundle.DeroTheme(bundle.AppColor))
+		go func() {
+			// bundle.DeroTheme() has a light and dark theme
+			fyne.CurrentApp().Settings().SetTheme(bundle.DeroTheme(bundle.AppColor))
 
-		// We can tie into the current text color of dReams with bundle.TextColor
-		connect_box.Balance.Color = bundle.TextColor
-		connect_box.Balance.Refresh()
-	})
-	radio.Horizontal = true
+			// reset all widgets with new skin, this will disconnect wallet
+			d.Window.SetContent(container.NewMax(d.Background, LayoutAllItems(imported, d)))
+
+			// We can tie into the current text color of dReams with bundle.TextColor
+			connect_box.Balance.Color = bundle.TextColor
+			connect_box.Balance.Refresh()
+		}()
+	}
 
 	// A container for our widgets
 	tab1_cont := container.NewBorder(label, container.NewCenter(radio), nil, nil)
 
-	// Another container for widgets on a different tab
-	tab2_cont := container.NewCenter(widget.NewButton("Import", func() { go importPackage() }))
+	// Another container for widgets on a different tab,
+	// importWidget() can import and run go packages see import.go for details
+	tab2_cont := container.NewMax(container.NewCenter(container.NewAdaptiveGrid(3, layout.NewSpacer(), importWidget(d))))
 
 	// These are the tabs we want in our Template
 	// First tab is labels and radio widget with a dynamic alpha layer behind it
