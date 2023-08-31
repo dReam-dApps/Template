@@ -3,6 +3,7 @@ package template
 import (
 	"image/color"
 
+	"github.com/dReam-dApps/dImports/dimport"
 	dreams "github.com/dReam-dApps/dReams"
 	"github.com/dReam-dApps/dReams/bundle"
 	"github.com/dReam-dApps/dReams/dwidget"
@@ -34,7 +35,7 @@ var indexLabel = widget.NewLabel("Indexed SCIDs:")
 // Entire Template dApp layout is in this func, returned as fyne.CanvasObject
 // it can be handled differently depending on if it is imported or not,
 // 'd' is the dReams app object which Templates routines will get signals and checks from
-func LayoutAllItems(imported bool, d *dreams.AppObject) (max fyne.CanvasObject) {
+func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 	// Place the global labels into containers
 	label := container.NewCenter(container.NewHBox(gnomonLabel, indexLabel, daemonLabel))
 
@@ -62,8 +63,8 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) (max fyne.CanvasObject) 
 			// bundle.DeroTheme() has a light and dark theme
 			fyne.CurrentApp().Settings().SetTheme(bundle.DeroTheme(bundle.AppColor))
 
-			// reset all widgets with new skin, this will disconnect wallet
-			d.Window.SetContent(container.NewMax(d.Background, LayoutAllItems(imported, d)))
+			// Reset all widgets with new skin, this will disconnect wallet
+			d.Window.Content().Refresh()
 
 			// We can tie into the current text color of dReams with bundle.TextColor
 			connect_box.Balance.Color = bundle.TextColor
@@ -75,8 +76,9 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) (max fyne.CanvasObject) 
 	tab1_cont := container.NewBorder(label, container.NewCenter(radio), nil, nil)
 
 	// Another container for widgets on a different tab,
-	// importWidget() can import and run go packages see import.go for details
-	tab2_cont := container.NewMax(container.NewCenter(container.NewAdaptiveGrid(3, layout.NewSpacer(), importWidget(d))))
+	// ImportWidget() can import and run Go packages
+	// see "github.com/dReam-dApps/dImports/dimport" for details
+	tab2_cont := container.NewMax(container.NewCenter(container.NewAdaptiveGrid(3, layout.NewSpacer(), dimport.ImportWidget(d))))
 
 	// These are the tabs we want in our Template
 	// First tab is labels and radio widget with a dynamic alpha layer behind it
@@ -102,19 +104,17 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) (max fyne.CanvasObject) 
 	// Local tabs should be placed at bottom of Template
 	tabs.SetTabLocation(container.TabLocationBottom)
 
-	// If we are importing this Template we can place our
-	// tabs in final max container and start required routines passing in 'd'
+	// If we are importing this Template we can start our
+	// packages routine passing in 'd'
 	if imported {
-		max = container.NewMax(tabs)
 		go fetch1(d)
 	} else {
-		// If Template is running independently, we can add a VBox
-		// that will contain the required components for Dero RPC
-		// connection and status indicators, see connectBox() below for more info
-		max = container.NewMax(tabs, container.NewVBox(layout.NewSpacer(), connectBox()))
+		// If Template is running independently, rpc connection or the layout
+		// could be altered here if required. For this Template the
+		// required rpc objects are placed inside StartApp()
 	}
 
-	return
+	return container.NewMax(tabs)
 }
 
 // This is a construction of dwidget.DeroRpcEntries which is used to

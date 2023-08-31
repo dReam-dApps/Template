@@ -19,6 +19,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 )
 
 // // dReams Template dApp
@@ -32,7 +33,7 @@ func StartApp() {
 	runtime.GOMAXPROCS(n)
 
 	// Initialize logger to Stdout
-	menu.InitLogrusLog(runtime.GOOS == "windows")
+	menu.InitLogrusLog(logrus.InfoLevel)
 
 	// Read dReams config file
 	config := menu.ReadDreamsConfig(app_name)
@@ -48,9 +49,18 @@ func StartApp() {
 	w.Resize(fyne.NewSize(1400, 800))
 	w.SetMaster()
 
-	// Channels used for closing
-	quit := make(chan struct{})
+	// Channel used for closing
 	done := make(chan struct{})
+
+	// Here we make a dreams.AppObject for our Template,
+	// initializing Background that is a max container with a canvas.Image,
+	// Window as our Fyne window 'w' and App as Fyne App 'a'
+	dreams.Theme.Img = *canvas.NewImageFromResource(nil)
+	d := dreams.AppObject{
+		App:        a,
+		Window:     w,
+		Background: container.NewMax(&dreams.Theme.Img),
+	}
 
 	// Set what we'd like to happen on close.
 	// Here we are saving dReams config file with Skin,
@@ -63,7 +73,7 @@ func StartApp() {
 				DBtype: menu.Gnomes.DBType,
 			})
 		menu.Gnomes.Stop(app_name)
-		quit <- struct{}{}
+		d.StopProcess()
 		w.Close()
 	}
 
@@ -83,30 +93,22 @@ func StartApp() {
 	// Initialize Gnomon fast sync to true so we can quickly create a DB to use
 	menu.Gnomes.Fast = true
 
-	// Here we make a dreams.AppObject for our Template,
-	// initializing Background that is a max container with a canvas.Image
-	// and Window as our Fyne window 'w'
-	dreams.Theme.Img = *canvas.NewImageFromResource(nil)
-	d := dreams.AppObject{
-		Window:     w,
-		Background: container.NewMax(&dreams.Theme.Img),
-	}
-
-	// Here we start Templates main process, as you build your Template
-	// additions may be needed to this process to meet to your requirements
+	// Here we start the main process, if Template was being imported for use this would be
+	// the main process of the parent app. It will lead then call Templates fetch() and close it when exiting.
+	// As you build your Template, additions can be made either here or in fetch(), keeping parent app
+	// functions in mind if used as a import so to avoid redundant calls.
 	go func() {
 		// Print out some info about our Template
 		logger.Printf("[%s] %s %s %s\n", app_name, rpc.DREAMSv, runtime.GOOS, runtime.GOARCH)
 
 		// Delay the routine to give time for app to start
-		time.Sleep(6 * time.Second)
+		time.Sleep(3 * time.Second)
 
-		// dReams runs on 3 second base tick, we can use any offset required
-		var offset int
+		// dReams runs on 3 second base tick
 		ticker := time.NewTicker(3 * time.Second)
 
-		// Initialize a token balance map
-		rpc.Wallet.TokenBal = make(map[string]uint64)
+		// Initialize dReams token balance maps
+		rpc.InitBalances()
 
 		for {
 			select {
@@ -118,7 +120,12 @@ func StartApp() {
 
 				// Get any balances required
 				rpc.Wallet.GetBalance()
-				//rpc.Wallet.GetTokenBalance("token_name", TOKEN_SCID)
+
+				// // To get a single tokens balance
+				// rpc.Wallet.GetTokenBalance("token_name", TOKEN_SCID)
+
+				// // To get all supported dReams token balances
+				// rpc.GetDreamsBalances(rpc.SCIDs)
 
 				// Refresh Dero balance in UI display
 				connect_box.RefreshBalance()
@@ -161,15 +168,11 @@ func StartApp() {
 					connect_box.Disconnect.SetChecked(false)
 				}
 
-				// Here we can use our offset to call a function once every 30 seconds
-				offset++
-				if offset%10 == 0 {
-					logger.Println("[Template] Offset called here")
-					offset = 0
-				}
+				// Signal to LayoutAllItems() that we are ready for it to do some work
+				d.SignalChannel()
 
 				// Exit Templates main process
-			case <-quit:
+			case <-d.Closing():
 				logger.Println("[Template] Closing...")
 
 				// Stop Gnomon indicator if it exists
@@ -180,19 +183,28 @@ func StartApp() {
 				// Stop Templates ticker
 				ticker.Stop()
 
-				// Close out all other routines and send done signal before returning
+				// Stop running dApp routines
+				d.CloseAllDapps()
+				time.Sleep(time.Second)
+
+				// Send done signal once all routines are closed before returning
 				done <- struct{}{}
 				return
 			}
 		}
 	}()
 
-	// Set Templates content as a max container with our 'd.Background' first
-	// followed by Templates LayoutAllItems(), using a delayed routine here to allow
-	// our window to run for a moment before placing layout
+	// LayoutAllItems() has one routine of fetch1(), we can set a channel for it in dreams.AppObject
+	d.SetChannels(1)
+
+	// Set Templates content as a max container with our 'd.Background'
+	// first, followed by Templates LayoutAllItems(), finally a VBox
+	// that will contain the required components for Dero RPC
+	// connection and status indicators, see connectBox() for more info
 	go func() {
+		// using a delayed routine here to allow our window to run for a moment before placing layout
 		time.Sleep(450 * time.Millisecond)
-		w.SetContent(container.NewMax(d.Background, LayoutAllItems(false, &d)))
+		w.SetContent(container.NewMax(d.Background, LayoutAllItems(true, &d), container.NewVBox(layout.NewSpacer(), connectBox())))
 	}()
 
 	// Start Template dApp
