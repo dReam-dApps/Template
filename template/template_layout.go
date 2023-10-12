@@ -51,7 +51,7 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 		switch s {
 		case "Dark":
 			// We can tie into the current AppColor of dReams with bundle.AppColor
-			// when Templates closes it wil save the AppColor
+			// when Templates closes it will save the AppColor
 			bundle.AppColor = color.Black
 		case "Light":
 			bundle.AppColor = color.White
@@ -79,6 +79,8 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 	// ImportWidget() can import and run Go packages
 	// see "github.com/dReam-dApps/dImports/dimport" for details
 	tab2_cont := container.NewMax(container.NewCenter(container.NewAdaptiveGrid(3, layout.NewSpacer(), dimport.ImportWidget(d))))
+
+	//// Tab 3 start here
 
 	// These are the tabs we want in our Template
 	// First tab is labels and radio widget with a dynamic alpha layer behind it
@@ -152,7 +154,7 @@ func connectBox() *fyne.Container {
 	connect_box.AddDaemonOptions(config.Daemon)
 
 	// Adding dReams indicator panel for wallet, daemon and Gnomon
-	connect_box.Container.Objects[0].(*fyne.Container).Add(menu.StartIndicators())
+	connect_box.AddIndicator(menu.StartIndicators())
 
 	return connect_box.Container
 }
