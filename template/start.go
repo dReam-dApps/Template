@@ -53,13 +53,13 @@ func StartApp() {
 	done := make(chan struct{})
 
 	// Here we make a dreams.AppObject for our Template,
-	// initializing Background that is a max container with a canvas.Image,
+	// initializing Background that is a stack (max) container with a canvas.Image,
 	// Window as our Fyne window 'w' and App as Fyne App 'a'
 	dreams.Theme.Img = *canvas.NewImageFromResource(nil)
 	d := dreams.AppObject{
 		App:        a,
 		Window:     w,
-		Background: container.NewMax(&dreams.Theme.Img),
+		Background: container.NewStack(&dreams.Theme.Img),
 	}
 
 	// Set what we'd like to happen on close.
@@ -197,14 +197,14 @@ func StartApp() {
 	// LayoutAllItems() has one routine of fetch1(), we can set a channel for it in dreams.AppObject
 	d.SetChannels(1)
 
-	// Set Templates content as a max container with our 'd.Background'
+	// Set Templates content as a stack (max) container with our 'd.Background'
 	// first, followed by Templates LayoutAllItems(), finally a VBox
 	// that will contain the required components for Dero RPC
 	// connection and status indicators, see connectBox() for more info
 	go func() {
 		// using a delayed routine here to allow our window to run for a moment before placing layout
 		time.Sleep(450 * time.Millisecond)
-		w.SetContent(container.NewMax(d.Background, LayoutAllItems(true, &d), container.NewVBox(layout.NewSpacer(), connectBox())))
+		w.SetContent(container.NewStack(d.Background, LayoutAllItems(true, &d), container.NewVBox(layout.NewSpacer(), connectBox())))
 	}()
 
 	// Start Template dApp

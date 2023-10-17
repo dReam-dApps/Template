@@ -18,7 +18,7 @@ import (
 
 // The premise of how dReams imports packages is for the package
 // to be contained within a LayoutAllItems() which returns a
-// Fyne max container and starts any required routines. Using this
+// Fyne stack (max) container and starts any required routines. Using this
 // Template package you can create local dApps that will run independently
 // while also being able to be imported for use in other Go/Fyne applications.
 // dReams has structs like dream.ContainerStack that can help in organizing content
@@ -78,7 +78,7 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 	// Another container for widgets on a different tab,
 	// ImportWidget() can import and run Go packages
 	// see "github.com/dReam-dApps/dImports/dimport" for details
-	tab2_cont := container.NewMax(container.NewCenter(container.NewAdaptiveGrid(3, layout.NewSpacer(), dimport.ImportWidget(d))))
+	tab2_cont := container.NewStack(container.NewCenter(container.NewAdaptiveGrid(3, layout.NewSpacer(), dimport.ImportWidget(d))))
 
 	//// Tab 3 start here
 
@@ -87,7 +87,7 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 	// Second is a empty tab
 	// Third is a UI log which can be used to record session TXs and info
 	tabs := container.NewAppTabs(
-		container.NewTabItem("Tab1", container.NewMax(bundle.NewAlpha120(), tab1_cont)),
+		container.NewTabItem("Tab1", container.NewStack(bundle.NewAlpha120(), tab1_cont)),
 		container.NewTabItem("Tab2", tab2_cont),
 		container.NewTabItem("Log", rpc.SessionLog()))
 
@@ -116,7 +116,7 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 		// required rpc objects are placed inside StartApp()
 	}
 
-	return container.NewMax(tabs)
+	return container.NewStack(tabs)
 }
 
 // This is a construction of dwidget.DeroRpcEntries which is used to
