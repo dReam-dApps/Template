@@ -86,10 +86,10 @@ github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsr
 github.com/cpuguy83/go-md2man/v2 v2.0.1/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/creachadair/jrpc2 v0.43.0 h1:sgYSOoAWXZ5cx9pd2pYH8dkrjCNdDpFwhO4ucMeUz7U=
 github.com/creachadair/jrpc2 v0.43.0/go.mod h1:oOdNFoMQQpSirGcSujG10NYl05K/IYrIUUNbh+/Xcd8=
-github.com/dReam-dApps/dImports v0.1.0 h1:qKnKliwOAZ9KHAej6YbyVAaxIQ+vPYLOWRD3lBXz6dI=
-github.com/dReam-dApps/dImports v0.1.0/go.mod h1:GIn9P+Op5EqonUR2Yt3zuh8m3s/8T081Hg2i+7lLryM=
-github.com/dReam-dApps/dReams v0.10.2-0.20231016235811-83bf58062882 h1:jjXasO4Fc0YuXknvLOlnx6V7SL72+OvYgTLTlIYo66g=
-github.com/dReam-dApps/dReams v0.10.2-0.20231016235811-83bf58062882/go.mod h1:b+c0MNd2zdBisw3P5nKZVP39TrJlZcHXUPpgKMspEmg=
+github.com/dReam-dApps/dImports v0.1.1-0.20231017190638-0edb72660253 h1:VxBQKD77GpRKYp7Nqr+h/LoHTIu9uWDG1tjRkiMTIjs=
+github.com/dReam-dApps/dImports v0.1.1-0.20231017190638-0edb72660253/go.mod h1:hA6YING43XcM5JmHifDJI2Knj2VafrycWXMzAnrpvCU=
+github.com/dReam-dApps/dReams v0.10.2-0.20231017180711-dcc2d0ec5e25 h1:1fsj1AEyKUSbJdK1kaJRrKgM5w3pTnzFHS81HhT7+7c=
+github.com/dReam-dApps/dReams v0.10.2-0.20231017180711-dcc2d0ec5e25/go.mod h1:b+c0MNd2zdBisw3P5nKZVP39TrJlZcHXUPpgKMspEmg=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
