@@ -81,6 +81,26 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 	tab2_cont := container.NewStack(container.NewCenter(container.NewAdaptiveGrid(3, layout.NewSpacer(), dimport.ImportWidget(d))))
 
 	//// Tab 3 start here
+	rpc_entries := dwidget.NewHorizontalEntries("", 1)
+	rpc_entries.Button.OnTapped = func() {
+		rpc.GetAddress(app_name)
+		rpc.Ping()
+	}
+
+	rpc_entries.AddIndicator(menu.StartIndicators())
+
+	message_button := widget.NewButton("Message", func() {
+		menu.SendMessageMenu("", nil)
+	})
+
+	dest_entry := widget.NewEntry()
+	dest_entry.SetPlaceHolder("Address:")
+
+	asset_button := widget.NewButton("Asset", func() {
+		rpc.SendAsset(rpc.DreamsSCID, dest_entry.Text, true)
+	})
+
+	tab3_cont := container.NewBorder(rpc_entries.Container, dest_entry, asset_button, message_button)
 
 	// These are the tabs we want in our Template
 	// First tab is labels and radio widget with a dynamic alpha layer behind it
@@ -89,6 +109,7 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Tab1", container.NewStack(bundle.NewAlpha120(), tab1_cont)),
 		container.NewTabItem("Tab2", tab2_cont),
+		container.NewTabItem("Tab3", tab3_cont),
 		container.NewTabItem("Log", rpc.SessionLog()))
 
 	// What will happen when tabs are selected locally
