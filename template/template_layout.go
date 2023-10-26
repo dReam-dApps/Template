@@ -91,6 +91,9 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 		container.NewTabItem("Tab2", tab2_cont),
 		container.NewTabItem("Log", rpc.SessionLog()))
 
+	//// Workshop address here
+	///  dero1qyr725edhmd5lqrg75y56guj58cldv2fsau49ee2n7f0cdkhy2fkgqq4s06km
+
 	// What will happen when tabs are selected locally
 	tabs.OnSelected = func(ti *container.TabItem) {
 		switch ti.Text {
