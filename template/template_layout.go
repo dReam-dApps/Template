@@ -7,6 +7,7 @@ import (
 	dreams "github.com/dReam-dApps/dReams"
 	"github.com/dReam-dApps/dReams/bundle"
 	"github.com/dReam-dApps/dReams/dwidget"
+	"github.com/dReam-dApps/dReams/gnomes"
 	"github.com/dReam-dApps/dReams/menu"
 	"github.com/dReam-dApps/dReams/rpc"
 
@@ -110,7 +111,7 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 		container.NewTabItem("Tab1", container.NewStack(bundle.NewAlpha120(), tab1_cont)),
 		container.NewTabItem("Tab2", tab2_cont),
 		container.NewTabItem("Tab3", tab3_cont),
-		container.NewTabItem("Log", rpc.SessionLog()))
+		container.NewTabItem("Log", rpc.SessionLog(app_name, version)))
 
 	//// Workshop address here
 	///  dero1qyr725edhmd5lqrg75y56guj58cldv2fsau49ee2n7f0cdkhy2fkgqq4s06km
@@ -160,8 +161,8 @@ func connectBox() *fyne.Container {
 		rpc.Ping()
 
 		// Here we are starting Gnomon without a search filter to index all SCIDs
-		if rpc.Daemon.IsConnected() && !menu.Gnomes.IsInitialized() && !menu.Gnomes.Start {
-			go menu.StartGnomon(app_name, menu.Gnomes.DBType, []string{}, 0, 0, nil)
+		if rpc.Daemon.IsConnected() && !gnomon.IsInitialized() && !gnomon.IsStarting() {
+			go gnomes.StartGnomon(app_name, gnomon.DBStorageType(), []string{}, 0, 0, nil)
 		}
 	}
 
@@ -169,7 +170,7 @@ func connectBox() *fyne.Container {
 	// will use here to shut down Gnomon on daemon disconnection
 	connect_box.Disconnect.OnChanged = func(b bool) {
 		if !b {
-			menu.Gnomes.Stop(app_name)
+			gnomon.Stop(app_name)
 		}
 	}
 

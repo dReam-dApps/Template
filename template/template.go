@@ -3,9 +3,10 @@ package template
 import (
 	"time"
 
+	"github.com/blang/semver/v4"
 	dreams "github.com/dReam-dApps/dReams"
 	"github.com/dReam-dApps/dReams/dwidget"
-	"github.com/dReam-dApps/dReams/menu"
+	"github.com/dReam-dApps/dReams/gnomes"
 	"github.com/dReam-dApps/dReams/rpc"
 )
 
@@ -18,6 +19,11 @@ var connect_box *dwidget.DeroRpcEntries
 
 // A variable to control Gnomon sync status local to Templates requirements
 var template_synced bool
+
+var version = semver.MustParse("0.2.0-dev")
+
+// Global Gnomon
+var gnomon = gnomes.NewGnomes()
 
 // We can use this func for any initialization required by Template
 func initValues() {
@@ -88,7 +94,7 @@ func fetch2(d *dreams.AppObject) {
 
 			// Template will control template_synced, we do not want
 			// to preform this scan while dReams is configuring
-			if !template_synced && menu.GnomonScan(d.IsConfiguring()) {
+			if !template_synced && gnomes.GnomonScan(d.IsConfiguring()) {
 				// Preform required funcs and set local synced var to true
 				logger.Println("[Template] Syncing")
 
