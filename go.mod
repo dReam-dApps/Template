@@ -7,7 +7,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/civilware/Gnomon v0.0.0-20231122200651-d74a0cfd22ca
 	github.com/dReam-dApps/dImports v0.1.1-0.20231017190638-0edb72660253
-	github.com/dReam-dApps/dReams v0.10.2-0.20231208233042-9a0f85455c0a
+	github.com/dReam-dApps/dReams v0.10.2-0.20231209164135-6b803600e173
 	github.com/sirupsen/logrus v1.9.3
 )
 
