@@ -7,10 +7,12 @@ import (
 	dreams "github.com/dReam-dApps/dReams"
 	"github.com/dReam-dApps/dReams/bundle"
 	"github.com/dReam-dApps/dReams/dwidget"
+	"github.com/dReam-dApps/dReams/gnomes"
 	"github.com/dReam-dApps/dReams/menu"
 	"github.com/dReam-dApps/dReams/rpc"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
@@ -85,14 +87,16 @@ func LayoutAllItems(imported bool, d *dreams.AppObject) fyne.CanvasObject {
 	// These are the tabs we want in our Template
 	// First tab is labels and radio widget with a dynamic alpha layer behind it
 	// Second is a empty tab
-	// Third is a UI log which can be used to record session TXs and info
+	// Third is a Fyne cli terminal app for use with a wallets, dev tools
+	// Fourth is a UI log which can be used to record session TXs and info
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Tab1", container.NewStack(bundle.NewAlpha120(), tab1_cont)),
 		container.NewTabItem("Tab2", tab2_cont),
-		container.NewTabItem("Log", rpc.SessionLog()))
-
-	//// Workshop address here
-	///  dero1qyr725edhmd5lqrg75y56guj58cldv2fsau49ee2n7f0cdkhy2fkgqq4s06km
+		container.NewTabItem("Terminal", startTerminal()),
+		// dReams Assets and Market can be imported with,
+		// container.NewTabItem("Assets", menu.PlaceAssets(app_name, profile(d), func() { logger.Println("[Template] Rescan func") }, bundle.ResourceMarketCirclePng, d)),
+		// container.NewTabItem("Market", menu.PlaceMarket(d)),
+		container.NewTabItem("Log", rpc.SessionLog(app_name, version)))
 
 	// What will happen when tabs are selected locally
 	tabs.OnSelected = func(ti *container.TabItem) {
@@ -139,8 +143,8 @@ func connectBox() *fyne.Container {
 		rpc.Ping()
 
 		// Here we are starting Gnomon without a search filter to index all SCIDs
-		if rpc.Daemon.IsConnected() && !menu.Gnomes.IsInitialized() && !menu.Gnomes.Start {
-			go menu.StartGnomon(app_name, menu.Gnomes.DBType, []string{}, 0, 0, nil)
+		if rpc.Daemon.IsConnected() && !gnomon.IsInitialized() && !gnomon.IsStarting() {
+			go gnomes.StartGnomon(app_name, gnomon.DBStorageType(), []string{}, 0, 0, nil)
 		}
 	}
 
@@ -148,7 +152,7 @@ func connectBox() *fyne.Container {
 	// will use here to shut down Gnomon on daemon disconnection
 	connect_box.Disconnect.OnChanged = func(b bool) {
 		if !b {
-			menu.Gnomes.Stop(app_name)
+			gnomon.Stop(app_name)
 		}
 	}
 
@@ -160,4 +164,20 @@ func connectBox() *fyne.Container {
 	connect_box.AddIndicator(menu.StartIndicators())
 
 	return connect_box.Container
+}
+
+// Example of basic profile layout if importing dReams Assets
+func profile(d *dreams.AppObject) fyne.CanvasObject {
+	line := canvas.NewLine(bundle.TextColor)
+	form := []*widget.FormItem{}
+	form = append(form, widget.NewFormItem("Name", menu.NameEntry()))
+	form = append(form, widget.NewFormItem("", layout.NewSpacer()))
+	form = append(form, widget.NewFormItem("", container.NewVBox(line)))
+	form = append(form, widget.NewFormItem("Theme", menu.ThemeSelect(d)))
+	form = append(form, widget.NewFormItem("", container.NewVBox(line)))
+
+	spacer := canvas.NewRectangle(color.Transparent)
+	spacer.SetMinSize(fyne.NewSize(450, 0))
+
+	return container.NewCenter(container.NewBorder(spacer, nil, nil, nil, widget.NewForm(form...)))
 }

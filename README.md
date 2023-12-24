@@ -3,7 +3,7 @@ Template for building [Dero](https://dero.io) and [dReam dApps](https://dreamdap
 
 ![dReamer](https://raw.githubusercontent.com/SixofClubsss/dreamdappsite/main/assets/dReamerUp.png)
 
-This app serves no purpose other then to help you build on Dero. It uses [Fyne](https://fyne.io/) and [dReams packages](https://github.com/dReam-dApps/dReams) to make a  GUI shell app pre-configured with Dero RPC connection and [Gnomon](https://github.com/civilware/Gnomon) indexer. 
+This app serves no purpose other then to help you build on Dero. It uses [Fyne](https://fyne.io/) and [dReams packages](https://github.com/dReam-dApps/dReams) to make a  GUI shell app pre-configured with Dero RPC connection and [Gnomon](https://github.com/civilware/Gnomon) indexer. It contains dev tools like a terminal app from Fyne and dReams dImports.
 
 The repo is structured in a way so you can build isolated dApps, as well as ones that can be integrated with other Dero dApps. As the dReams platform evolves this Template will evolve with it. The code comments will currently serve as the main guide on how to build with this Template and integrate into dReams.
 
@@ -30,7 +30,7 @@ cd Template
 ```
 go run .
 ```
-- Change directory and package name(s) and import paths accordingly for your import
+- Change directory and package name(s) and import paths accordingly for your import before pushing repo
 
 #### Donations
 - *Dero Address*: dero1qyr8yjnu6cl2c5yqkls0hmxe6rry77kn24nmc5fje6hm9jltyvdd5qq4hn5pn

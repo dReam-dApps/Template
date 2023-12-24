@@ -11,6 +11,7 @@ import (
 	"github.com/civilware/Gnomon/structures"
 	dreams "github.com/dReam-dApps/dReams"
 	"github.com/dReam-dApps/dReams/bundle"
+	"github.com/dReam-dApps/dReams/gnomes"
 	"github.com/dReam-dApps/dReams/menu"
 	"github.com/dReam-dApps/dReams/rpc"
 	"github.com/sirupsen/logrus"
@@ -32,9 +33,6 @@ func StartApp() {
 	n := runtime.NumCPU()
 	runtime.GOMAXPROCS(n)
 
-	// Initialize logger to Stdout
-	menu.InitLogrusLog(logrus.InfoLevel)
-
 	// Read dReams config file
 	config := menu.ReadDreamsConfig(app_name)
 
@@ -55,11 +53,11 @@ func StartApp() {
 	// Here we make a dreams.AppObject for our Template,
 	// initializing Background that is a stack (max) container with a canvas.Image,
 	// Window as our Fyne window 'w' and App as Fyne App 'a'
-	dreams.Theme.Img = *canvas.NewImageFromResource(nil)
+	menu.Theme.Img = *canvas.NewImageFromResource(nil)
 	d := dreams.AppObject{
 		App:        a,
 		Window:     w,
-		Background: container.NewStack(&dreams.Theme.Img),
+		Background: container.NewStack(&menu.Theme.Img),
 	}
 
 	// Set what we'd like to happen on close.
@@ -70,9 +68,10 @@ func StartApp() {
 			dreams.SaveData{
 				Skin:   bundle.AppColor,
 				Daemon: []string{rpc.Daemon.Rpc},
-				DBtype: menu.Gnomes.DBType,
+				DBtype: gnomon.DBStorageType(),
 			})
-		menu.Gnomes.Stop(app_name)
+		gnomon.Stop(app_name)
+		exitTerminal()
 		d.StopProcess()
 		w.Close()
 	}
@@ -90,25 +89,20 @@ func StartApp() {
 		closeFunc()
 	}()
 
-	// Initialize Gnomon fast sync to true so we can quickly create a DB to use
-	menu.Gnomes.Fast = true
+	// Initialize Gnomon fast sync to true so we can quickly create a DB to use,
+	// force fast sync is set true and will fast sync when 10000+ blocks behind chain height
+	gnomon.SetFastsync(true, true, 10000)
 
 	// Here we start the main process, if Template was being imported for use this would be
 	// the main process of the parent app. It will lead then call Templates fetch() and close it when exiting.
 	// As you build your Template, additions can be made either here or in fetch(), keeping parent app
 	// functions in mind if used as a import so to avoid redundant calls.
 	go func() {
-		// Print out some info about our Template
-		logger.Printf("[%s] %s %s %s\n", app_name, rpc.DREAMSv, runtime.GOOS, runtime.GOARCH)
-
 		// Delay the routine to give time for app to start
 		time.Sleep(3 * time.Second)
 
 		// dReams runs on 3 second base tick
 		ticker := time.NewTicker(3 * time.Second)
-
-		// Initialize dReams token balance maps
-		rpc.InitBalances()
 
 		for {
 			select {
@@ -131,37 +125,40 @@ func StartApp() {
 				connect_box.RefreshBalance()
 
 				// Update Gnomon end point if daemon has changed
-				menu.GnomonEndPoint()
+				gnomes.EndPoint()
 
 				// If daemon is connected and Gnomon is initialized we will set the hidden Disconnect
 				// object in the connect_box to true, this Disconnect will control Gnomon shut down
-				if rpc.Daemon.IsConnected() && menu.Gnomes.IsInitialized() {
+				if rpc.Daemon.IsConnected() && gnomon.IsInitialized() {
 					connect_box.Disconnect.SetChecked(true)
 
+					// dReams package has gnomes.State() that can be use to maintain
+					// a dApps Gnomon status, or you can build as per your needs as below
+
 					// If Gnomon is running we can start to do some checks
-					if menu.Gnomes.IsRunning() {
+					if gnomon.IsRunning() {
 						// This will populate the Gnomes.SCID count var
-						contracts := menu.Gnomes.IndexContains()
+						contracts := gnomon.IndexContains()
 
 						// Refresh Gnomon and daemon height displays
-						gnomonLabel.SetText(fmt.Sprintf("Gnomon Height: %d", menu.Gnomes.Indexer.LastIndexedHeight))
+						gnomonLabel.SetText(fmt.Sprintf("Gnomon Height: %d", gnomon.GetLastHeight()))
 						indexLabel.SetText(fmt.Sprintf("Indexed SCIDs: %d", len(contracts)))
-						daemonLabel.SetText(fmt.Sprintf("Daemon Height: %d", menu.Gnomes.Indexer.ChainHeight))
+						daemonLabel.SetText(fmt.Sprintf("Daemon Height: %d", gnomon.GetChainHeight()))
 
 						// This will set the Gnomes.Check value to
 						// true once 100 or more contracts have been indexed
-						if menu.Gnomes.HasIndex(100) {
-							menu.Gnomes.Checked(true)
+						if gnomon.HasIndex(100) {
+							gnomon.Checked(true)
 						}
 					}
 
 					// Here we can use some of the Indexer vars to set our Synced status
-					if menu.Gnomes.Indexer.LastIndexedHeight >= menu.Gnomes.Indexer.ChainHeight-3 {
-						menu.Gnomes.Synced(true)
+					if gnomon.GetLastHeight() >= gnomon.GetChainHeight()-3 {
+						gnomon.Synced(true)
 					} else {
 						// If Template is not synced we should handle that here
-						menu.Gnomes.Synced(false)
-						menu.Gnomes.Checked(false)
+						gnomon.Synced(false)
+						gnomon.Checked(false)
 					}
 				} else {
 					// If daemon is not connected we will set Disconnect object to false
@@ -176,8 +173,8 @@ func StartApp() {
 				logger.Println("[Template] Closing...")
 
 				// Stop Gnomon indicator if it exists
-				if menu.Gnomes.Icon_ind != nil {
-					menu.Gnomes.Icon_ind.Stop()
+				if gnomes.Indicator.Icon != nil {
+					gnomes.Indicator.Icon.Stop()
 				}
 
 				// Stop Templates ticker

@@ -4,19 +4,23 @@ go 1.20
 
 require (
 	fyne.io/fyne/v2 v2.4.1
-	github.com/civilware/Gnomon v0.0.0-20231002142459-ae4ce13fab05
-	github.com/dReam-dApps/dImports v0.1.1-0.20231017190638-0edb72660253
-	github.com/dReam-dApps/dReams v0.10.2-0.20231017180711-dcc2d0ec5e25
+	github.com/blang/semver/v4 v4.0.0
+	github.com/civilware/Gnomon v0.0.0-20231218151558-0ee387e75195
+	github.com/dReam-dApps/dImports v0.1.1
+	github.com/dReam-dApps/dReams v0.11.0
+	github.com/fyne-io/terminal v0.0.0-20230223114940-c76e408adbd3
 	github.com/sirupsen/logrus v1.9.3
 )
 
 require (
 	fyne.io/systray v1.10.1-0.20230722100817-88df1e0ffa9a // indirect
 	fyne.io/x/fyne v0.0.0-20230411205836-1ca0ead20763 // indirect
-	github.com/blang/semver/v4 v4.0.0 // indirect
+	github.com/ActiveState/termtest/conpty v0.5.0 // indirect
+	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/creachadair/jrpc2 v0.43.0 // indirect
+	github.com/creack/pty v1.1.11 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dchest/siphash v1.2.3 // indirect
 	github.com/deroproject/derohe v0.0.0-20230604143809-765b2db1f482 // indirect
@@ -68,15 +72,15 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/image v0.11.0 // indirect
 	golang.org/x/mobile v0.0.0-20230531173138-3c911d8e3eda // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.14.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/term v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.12.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

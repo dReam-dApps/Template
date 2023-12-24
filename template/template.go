@@ -3,10 +3,12 @@ package template
 import (
 	"time"
 
+	"github.com/blang/semver/v4"
 	dreams "github.com/dReam-dApps/dReams"
 	"github.com/dReam-dApps/dReams/dwidget"
-	"github.com/dReam-dApps/dReams/menu"
+	"github.com/dReam-dApps/dReams/gnomes"
 	"github.com/dReam-dApps/dReams/rpc"
+	"github.com/sirupsen/logrus"
 )
 
 // Your dApp name goes here
@@ -16,13 +18,22 @@ const app_name = "Template"
 // layout and StartApp(), it is not used when importing Template
 var connect_box *dwidget.DeroRpcEntries
 
-// A variable to control Gnomon sync status local to Templates requirements
-var template_synced bool
+// dApp version variable
+var version = semver.MustParse("0.2.0")
+
+// Global Gnomon
+var gnomon = gnomes.NewGnomes()
 
 // We can use this func for any initialization required by Template
-func initValues() {
-	template_synced = false
-	logger.Println("Template Initialized")
+func init() {
+	// Initialize logger to Stdout
+	gnomes.InitLogrusLog(logrus.InfoLevel)
+	logger.Println("[Template] Initialized")
+}
+
+// Return the current package version
+func Version() semver.Version {
+	return version
 }
 
 // // Process loop examples for packages
@@ -32,9 +43,6 @@ func initValues() {
 
 // fetch1() is a basic main process routine for Template dApp
 func fetch1(d *dreams.AppObject) {
-	// Set any initialization values here
-	initValues()
-
 	// Wait a moment before we start the loop
 	time.Sleep(3 * time.Second)
 
@@ -72,7 +80,9 @@ func fetch1(d *dreams.AppObject) {
 // have been made, we preform a initial Gnomon scan, check if
 // dReams is viewing Template and send a notification to dReams
 func fetch2(d *dreams.AppObject) {
-	initValues()
+	// A variable to control Gnomon sync status local to Templates requirements
+	var synced bool
+
 	time.Sleep(3 * time.Second)
 	for {
 		select {
@@ -88,13 +98,13 @@ func fetch2(d *dreams.AppObject) {
 
 			// Template will control template_synced, we do not want
 			// to preform this scan while dReams is configuring
-			if !template_synced && menu.GnomonScan(d.IsConfiguring()) {
+			if !synced && gnomes.Scan(d.IsConfiguring()) {
 				// Preform required funcs and set local synced var to true
 				logger.Println("[Template] Syncing")
 
 				//  someGnomonFuncs()
 
-				template_synced = true
+				synced = true
 			}
 
 			// Here we will see if dReams is currently viewing
@@ -145,10 +155,10 @@ func OnTabSelected(d *dreams.AppObject) {
 
 // Function for when Template tab is first connected
 func OnConnected() {
-	// soneFuncs()
+	// someFuncs()
 }
 
 // Function for when Template tab is disconnected
 func Disconnected() {
-	template_synced = false
+	// someFuncs()
 }
