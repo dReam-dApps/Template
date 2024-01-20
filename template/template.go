@@ -19,7 +19,7 @@ const app_name = "Template"
 var connect_box *dwidget.DeroRpcEntries
 
 // dApp version variable
-var version = semver.MustParse("0.2.0")
+var version = semver.MustParse("0.2.1")
 
 // Global Gnomon
 var gnomon = gnomes.NewGnomes()

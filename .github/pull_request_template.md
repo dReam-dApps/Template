@@ -21,6 +21,7 @@ Please select the right one.
 
 ## Which package(s) are impacted ?
 
+  - [ ] start.go
   - [ ] template
   - [ ] Misc (documentation, etc...)
 
@@ -29,6 +30,7 @@ Please select the right one.
 - [ ] I have performed a self-review of my code
 - [ ] I have commented my code
 - [ ] My changes generate no new warnings
+- [ ] I have updated the semver version (template.version)
 
 ## License
 
