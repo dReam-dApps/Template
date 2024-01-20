@@ -1,19 +1,19 @@
 module github.com/dReam-dApps/Template
 
-go 1.20
+go 1.21.5
 
 require (
-	fyne.io/fyne/v2 v2.4.1
+	fyne.io/fyne/v2 v2.4.4-0.20231224124904-a09bbd790b98
 	github.com/blang/semver/v4 v4.0.0
-	github.com/civilware/Gnomon v0.0.0-20231218151558-0ee387e75195
-	github.com/dReam-dApps/dImports v0.1.1
-	github.com/dReam-dApps/dReams v0.11.0
+	github.com/civilware/Gnomon v0.0.0-20240102201536-a5900d5a61da
+	github.com/dReam-dApps/dImports v0.1.2
+	github.com/dReam-dApps/dReams v0.11.1
 	github.com/fyne-io/terminal v0.0.0-20230223114940-c76e408adbd3
 	github.com/sirupsen/logrus v1.9.3
 )
 
 require (
-	fyne.io/systray v1.10.1-0.20230722100817-88df1e0ffa9a // indirect
+	fyne.io/systray v1.10.1-0.20231115130155-104f5ef7839e // indirect
 	fyne.io/x/fyne v0.0.0-20230411205836-1ca0ead20763 // indirect
 	github.com/ActiveState/termtest/conpty v0.5.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
